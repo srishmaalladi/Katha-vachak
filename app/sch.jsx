@@ -34,9 +34,13 @@ const sch = () => {
       if (!response.ok) {
         throw new Error(`Failed to generate image for scene: ${sceneText}`);
       }
-
+      console.log(response)
       const imageBlob = await response.blob();
-      return URL.createObjectURL(imageBlob); // Return an object URL to display the image
+      const correctedBlob = new Blob([imageBlob], { type: "image/jpeg" });
+      console.log(imageBlob)
+      console.log(response.type)
+      
+      return URL.createObjectURL(correctedBlob); // Return an object URL to display the image
     } catch (error) {
       console.error("Error generating image:", error);
       return null; // Return null in case of error
