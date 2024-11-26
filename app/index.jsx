@@ -2,8 +2,9 @@ import React from 'react';
 import { View, ImageBackground, Text } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import sch from './sch';
-const image = require('../assets/images/home.jpeg');
+import { MaterialCommunityIcons } from '@expo/vector-icons'; // Import MaterialCommunityIcons
+
+const image = require('../assets/images/working.png');
 
 const index = () => {
   const navigation = useNavigation();
@@ -13,31 +14,35 @@ const index = () => {
       source={image}
       style={{ flex: 1, width: '100%', height: '100%' }}
     >
-      <View className="container items-center justify-center h-3/5 m-5">
-        {/* View for Text and Button */}
-        <View className="flex-row items-center justify-between w-full">
-          {/* KATHA VACHAK Text */}
-          <View>
-            <Text className="text-4xl text-cyan-900 m-2">KATHA</Text>
-            <Text className="text-4xl text-cyan-900 m-4">VACHAK</Text>
-          </View>
-
-          {/* Button */}
+      <View style={{ flex: 1, justifyContent: 'flex-start', marginTop: 50 }}>
+        {/* View for Button at the top */}
+        <View style={{ alignItems: 'flex-end', paddingRight: 20 }}>
+          {/* Button with Icon */}
           <Button
-            mode="text" // This makes the button transparent with no outline
-            onPress={() => navigation.navigate('sch')} // Navigate to another page
+            mode="contained"
+            onPress={() => navigation.navigate('Sch')}
             style={{
-              backgroundColor: 'transparent',
-              paddingVertical: 15,  // Increase vertical padding for button height
-              paddingHorizontal: 20,  // Increase horizontal padding for button width
-              marginRight: 80,  // Right margin
+              backgroundColor: 'transparent', // Button background color
+              borderRadius: 30, // Rounded button
+              paddingVertical: 20, // Increased vertical padding for a larger button
+              paddingHorizontal: 40, // Increased horizontal padding for a larger button
+              elevation: 4, // Shadow effect
             }}
             labelStyle={{
-              color: 'black',  // Button text color
-              fontSize: 24,  // Increase font size of the button text
+              fontSize: 20, // Larger text size
+              color: 'black', // Text color
+            }}
+            contentStyle={{
+              flexDirection: 'row-reverse', // Icon appears to the right of text
+              alignItems: 'center',
             }}
           >
-            ➔
+            <MaterialCommunityIcons
+              name="arrow-right-circle" // Icon name
+              size={50} // Increased icon size
+              color="black" // Icon color
+              style={{ marginLeft: 10 }} // Space between text and icon
+            />
           </Button>
         </View>
       </View>
