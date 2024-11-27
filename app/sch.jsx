@@ -8,17 +8,19 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const Sch = () => {
   const [searchText, setSearchText] = useState("");
-  const [wordCount, setWordCount] = useState(""); // Word count input
-  const [qaList, setQaList] = useState([]); // List to hold scenes and generated images
-  const [inputHeight, setInputHeight] = useState(50); // Initial height of the text box
+  const [wordCount, setWordCount] = useState("");
+  const [qaList, setQaList] = useState([]);
+  const [loading, setLoading] = useState(false); // Loading state
+  const [inputHeight, setInputHeight] = useState(50);
 
   const generateImage = async (sceneText) => {
-    console.log("Generating image...");
+    console.log("generating image");
     try {
       const API_URL = "https://api-inference.huggingface.co/models/ZB-Tech/Text-to-Image";
       const HEADERS = {
@@ -40,28 +42,29 @@ const Sch = () => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
         reader.onerror = reject;
-        reader.readAsDataURL(imageBlob); // Convert Blob to Base64 Data URL
+        reader.readAsDataURL(imageBlob);
       });
 
-      return base64Data; // Return Base64 data URL
+      return base64Data;
     } catch (error) {
       console.error("Error generating image:", error);
-      return null; // Return null in case of error
+      return null;
     }
   };
 
   const handleSearch = async () => {
-    console.log(`Input: ${searchText}, Word Limit: ${wordCount}`);
+    console.log(searchtext+wordCount)
     if (searchText.trim()) {
+      setLoading(true); // Start loading
       try {
-        const response = await fetch("https://ed2f-34-124-255-218.ngrok-free.app/", {
+        const response = await fetch("https://f3e0-34-16-231-10.ngrok-free.app/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             input: searchText,
-            word_limit: wordCount ? parseInt(wordCount, 10) : 0, // Send word limit
+            word_limit: wordCount ? parseInt(wordCount, 10) : 0,
           }),
         });
 
@@ -69,23 +72,25 @@ const Sch = () => {
           throw new Error(`Error: ${response.statusText}`);
         }
 
-        const scenes = await response.json(); // Response should be an array of scenes
-
+        const scenes = await response.json();
         const updatedQaList = [];
         for (const scene of scenes) {
-          const imageUrl = await generateImage(scene.scene_text); // Generate image for each scene
+          const imageUrl = await generateImage(scene.scene_text);
           updatedQaList.push({
+            query: searchText, // Store the query
             scene_no: scene.scene_no,
             scene_text: scene.scene_text,
             image: imageUrl,
           });
         }
 
-        setQaList((prev) => [...prev, ...updatedQaList]); // Update QA list
-        setSearchText(""); // Clear input fields
+        setQaList((prev) => [...prev, ...updatedQaList]);
+        setSearchText("");
         setWordCount("");
       } catch (error) {
         console.error("Failed to fetch story:", error);
+      } finally {
+        setLoading(false); // End loading
       }
     }
   };
@@ -117,6 +122,9 @@ const Sch = () => {
             }}
           >
             <Text style={{ fontSize: 16, color: "#000", fontWeight: "bold" }}>
+              Query: {qa.query}
+            </Text>
+            <Text style={{ fontSize: 16, color: "#000", marginTop: 10 }}>
               Scene {qa.scene_no}:
             </Text>
             <Text style={{ fontSize: 16, color: "#000", marginTop: 5 }}>
@@ -182,8 +190,8 @@ const Sch = () => {
               elevation: 3,
             }}
           >
-            <TouchableOpacity onPress={handleSearch}>
-              <MaterialIcons name="search" size={24} color="#000" />
+            <TouchableOpacity onPress={handleSearch} disabled={loading}>
+              <MaterialIcons name="search" size={24} color={loading ? "#AAA" : "#000"} />
             </TouchableOpacity>
             <TextInput
               placeholder="Type your query..."
@@ -203,6 +211,14 @@ const Sch = () => {
             />
           </View>
         </View>
+
+        {/* Loading Indicator */}
+        {loading && (
+          <View style={{ marginTop: 20, alignItems: "center" }}>
+            <ActivityIndicator size="large" color="#000" />
+            <Text style={{ marginTop: 10, color: "#000", fontSize: 16 }}>Processing your query...</Text>
+          </View>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
