@@ -1,0 +1,70 @@
+claculator dockerfile
+FROM node:16-alpine
+WORKDIR /app
+COPY calculator.js /app
+CMD ["node", "calculator.js"] 
+
+dockercompose yaml
+version: '3.1'
+services:
+ db: 
+image: mysql:5.7
+ container_name: mysql_container
+ environment:
+ MYSQL_ROOT_PASSWORD: rootpassword
+ MYSQL_DATABASE: wordpress_db
+ MYSQL_USER: wordpress_user
+ MYSQL_PASSWORD: wordpress_pass
+ volumes:
+ - db_data:/var/lib/mysql
+ wordpress:
+ depends_on:
+ - db
+ image: wordpress:latest
+ container_name: wordpress_container
+ ports:
+ - "8000:80"
+ environment:
+ WORDPRESS_DB_HOST: db:3306
+ WORDPRESS_DB_USER: wordpress_user
+ WORDPRESS_DB_PASSWORD: wordpress_pass
+ WORDPRESS_DB_NAME: wordpress_db
+ volumes:
+ - ./wordpress_data:/var/www/html
+volumes: 
+db_data: 
+
+jenkins script
+pipeline {
+ agent any
+ tools {
+ maven 'MAVEN_HOME'
+ }
+ stages {
+ stage('git repo & clean') {
+ steps { 
+bat "rmdir /s /q SampleMavenJavaProject"
+ bat "git clone
+https://github.com/budarajumadhurika/SampleMavenJavaProject.gi
+t"
+ bat "mvn clean -f SampleMavenJavaProject"
+ }
+ }
+ stage('install') {
+ steps {
+ bat "mvn install -f SampleMavenJavaProject"
+ }
+ }
+ stage('test') {
+ steps {
+ bat "mvn test -f SampleMavenJavaProject"
+ }
+ }
+ stage('package') {
+ steps {
+ bat "mvn package -f SampleMavenJavaProject"
+ }
+ }
+ }
+} 
+
