@@ -45,28 +45,25 @@ pipeline {
  stages {
  stage('git repo & clean') {
  steps { 
-bat "rmdir /s /q SampleMavenJavaProject"
- bat "git clone
-https://github.com/budarajumadhurika/SampleMavenJavaProject.gi
-t"
- bat "mvn clean -f SampleMavenJavaProject"
+  bat "rmdir /s /q mavenjava"
+ bat "git clone https://github.com/srishmaalladi/mavenjava.git"
+ bat "mvn clean -f mavenjava"
  }
  }
  stage('install') {
  steps {
- bat "mvn install -f SampleMavenJavaProject"
+ bat "mvn install -f mavenjava"
  }
  }
  stage('test') {
  steps {
- bat "mvn test -f SampleMavenJavaProject"
+ bat "mvn test -f mavenjava"
  }
  }
  stage('package') {
  steps {
- bat "mvn package -f SampleMavenJavaProject"
+ bat "mvn package -f mavenjava"
  }
  }
  }
 } 
-
